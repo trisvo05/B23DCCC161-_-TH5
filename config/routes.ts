@@ -37,6 +37,21 @@
 		icon: 'ArrowsAltOutlined',
 	},
 
+	{
+		path: '/todo-list',
+		name: 'TodoList',
+		component: './TodoList',
+		icon: '',
+	},
+
+	{
+		path: '/study-progress-tracker',
+		name: 'StudyProgressTracker',
+		component: './StudyTracker',
+		icon: '',
+	},
+
+
 	// DANH MUC HE THONG
 	// {
 	// 	name: 'DanhMuc',

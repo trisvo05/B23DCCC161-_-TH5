@@ -43,15 +43,19 @@
 		component: './TodoList',
 		icon: '',
 	},
-
 	{
-		path: '/study-progress-tracker',
-		name: 'StudyProgressTracker',
-		component: './StudyTracker',
+		path: '/test',
+		name: 'Test',
+		component: 'Test',
 		icon: '',
 	},
-
-
+	{
+		path: '/QuestionBank',
+		name: 'Question Bank',
+		component: './QuestionBank',
+		icon: ''
+	},
+	
 	// DANH MUC HE THONG
 	// {
 	// 	name: 'DanhMuc',

@@ -55,6 +55,23 @@
 		component: './QuestionBank',
 		icon: ''
 	},
+	{
+		path: '/Admin',
+		name: 'Admin',
+		icon: 'LockOutlined',
+		routes: [
+			{
+				path: '/Admin/Employee',
+				name: 'Employee',
+				component: './Admin/Employee',
+			},
+			{
+				path: 'Admin/Service',
+				name: 'Service',
+				component: './Admin/Service',
+			},
+		],
+	},
 	
 	// DANH MUC HE THONG
 	// {

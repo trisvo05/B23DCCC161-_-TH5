@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Input, Select, Button, Table, Space, message, Typography, Modal, Form } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { Card, Input, Select, Button, Table, message, Typography, Modal, Form } from 'antd';
+import { PlusOutlined} from '@ant-design/icons';
 
 const { Title } = Typography;
 

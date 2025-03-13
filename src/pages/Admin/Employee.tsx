@@ -32,7 +32,7 @@ export const fetchData = (key: string): any => {
 	}
 };
 
-const EmployeeManager: React.FC = () => {
+const EmployeeManagement: React.FC = () => {
 	const [employeeList, setEmployeeList] = useState<Employee[]>([]);
 	const [modalOpen, setModalOpen] = useState<boolean>(false);
 	const [employeeForm] = Form.useForm();
@@ -176,4 +176,4 @@ const EmployeeManager: React.FC = () => {
 	);
 };
 
-export default EmployeeManager;
+export default EmployeeManagement;

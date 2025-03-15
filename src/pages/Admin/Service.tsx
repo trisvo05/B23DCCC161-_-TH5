@@ -8,21 +8,20 @@ interface Service {
 	duration: number;
 }
 
-// Utility functions for localStorage operations
-export const saveToStorage = (key: string, data: any) => {
+export const storeData = (key: string, value: any): void => {
 	try {
-		localStorage.setItem(key, JSON.stringify(data));
+		localStorage.setItem(key, JSON.stringify(value));
 	} catch (error) {
-		console.error('Error saving to localStorage:', error);
+		console.error('Error storing data:', error);
 	}
 };
 
-export const getFromStorage = (key: string): any => {
+export const fetchData = (key: string): any => {
 	try {
-		const data = localStorage.getItem(key);
-		return data ? JSON.parse(data) : null;
+		const stored = localStorage.getItem(key);
+		return stored ? JSON.parse(stored) : null;
 	} catch (error) {
-		console.error('Error reading from localStorage:', error);
+		console.error('Error fetching data:', error);
 		return null;
 	}
 };
@@ -33,7 +32,7 @@ const ServiceManagement: React.FC = () => {
 	const [form] = Form.useForm<Service>();
 
 	useEffect(() => {
-		const savedServices: Service[] = getFromStorage('services') || [];
+		const savedServices: Service[] = fetchData('services') || [];
 		setServices(savedServices);
 	}, []);
 
@@ -45,7 +44,7 @@ const ServiceManagement: React.FC = () => {
 	const deleteService = (id: number): void => {
 		const updatedList = services.filter((service) => service.id !== id);
 		setServices(updatedList);
-		saveToStorage('services', updatedList);
+		storeData('services', updatedList);
 		message.success('Dịch vụ đã được xóa thành công.');
 	};
 
@@ -55,7 +54,7 @@ const ServiceManagement: React.FC = () => {
 			: [...services, { ...values, id: Date.now() }];
 
 		setServices(updatedList);
-		saveToStorage('services', updatedList);
+		storeData('services', updatedList);
 		setModalOpen(false);
 		form.resetFields();
 		message.success('Dịch vụ đã được lưu thành công.');

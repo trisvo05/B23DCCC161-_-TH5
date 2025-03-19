@@ -1,118 +1,121 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Button, Modal, Form, Input, TimePicker, InputNumber, message } from 'antd';
 import dayjs from 'dayjs';
 
-interface WorkingHours {
+interface WorkHours {
   start: string;
   end: string;
 }
 
-interface Employee {
+interface Staff {
   id: number;
   name: string;
-  workingHours: WorkingHours;
-  dailyLimit: number;
+  workSchedule: WorkHours;
+  dailyQuota: number;
 }
 
-export const storeData = (key: string, value: any): void => {
+const saveToStorage = (key: string, value: any): void => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error('Error storing data:', error);
+    console.error('Storage Save Error:', error);
   }
 };
 
-export const fetchData = (key: string): any => {
+const loadFromStorage = (key: string): any => {
   try {
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : null;
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Storage Load Error:', error);
     return null;
   }
 };
 
-const EmployeeManagement: React.FC = () => {
-  const [employeeList, setEmployeeList] = useState<Employee[]>([]);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [employeeForm] = Form.useForm();
+const EmployeeManager: React.FC = () => {
+  const [staffList, setStaffList] = useState<Staff[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    const savedEmployees: Employee[] = fetchData('employees') || [];
-    setEmployeeList(savedEmployees);
+    const storedEmployees = loadFromStorage('staff') || [];
+    setStaffList(storedEmployees);
   }, []);
 
-  const openEditModal = (employee: Employee): void => {
-    employeeForm.setFieldsValue({
-      ...employee,
-      workingHours: {
-        start: employee.workingHours?.start ? dayjs(employee.workingHours.start, 'HH:mm') : null,
-        end: employee.workingHours?.end ? dayjs(employee.workingHours.end, 'HH:mm') : null,
+  const resetModal = () => {
+    form.resetFields();
+    setIsModalOpen(false);
+  };
+
+  const openEditDialog = (staff: Staff) => {
+    form.setFieldsValue({
+      ...staff,
+      workSchedule: {
+        start: dayjs(staff.workSchedule.start, 'HH:mm'),
+        end: dayjs(staff.workSchedule.end, 'HH:mm'),
       },
     });
-    setModalOpen(true);
+    setIsModalOpen(true);
   };
 
-  const deleteEmployee = (id: number): void => {
-    const newList = employeeList.filter(emp => emp.id !== id);
-    setEmployeeList(newList);
-    storeData('employees', newList);
-    message.success('Employee deleted successfully');
-  };
+  const removeStaff = useCallback((id: number) => {
+    setStaffList(prevList => {
+      const updatedList = prevList.filter(emp => emp.id !== id);
+      saveToStorage('staff', updatedList);
+      message.success('Successfully removed staff.');
+      return updatedList;
+    });
+  }, []);
 
-  const handleEmployeeSubmit = (formValues: any): void => {
-    const employeeData: Employee = {
-      ...formValues,
-      id: formValues.id || Date.now(),
-      workingHours: {
-        start: formValues.workingHours.start,
-        end: formValues.workingHours.end,
+  const handleSubmit = (values: any) => {
+    const newStaff: Staff = {
+      ...values,
+      id: values.id || Date.now(),
+      workSchedule: {
+        start: values.workSchedule.start.format('HH:mm'),
+        end: values.workSchedule.end.format('HH:mm'),
       },
     };
 
-    const updatedList = employeeList.some(emp => emp.id === formValues.id)
-      ? employeeList.map(emp => (emp.id === formValues.id ? { ...emp, ...employeeData } : emp))
-      : [...employeeList, employeeData];
+    setStaffList(prevList => {
+      const exists = prevList.some(emp => emp.id === values.id);
+      const updatedList = exists
+        ? prevList.map(emp => (emp.id === values.id ? { ...emp, ...newStaff } : emp))
+        : [...prevList, newStaff];
 
-    setEmployeeList(updatedList);
-    storeData('employees', updatedList);
-    setModalOpen(false);
-    employeeForm.resetFields();
-    message.success('Employee saved successfully');
+      saveToStorage('staff', updatedList);
+      message.success('Staff details saved.');
+      return updatedList;
+    });
+
+    resetModal();
   };
 
-  const tableColumns = [
+  const getColumns = () => [
     {
-      title: 'Họ và Tên',
+      title: 'Tên nhân viên',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Giờ làm việc',
-      dataIndex: 'workingHours',
-      key: 'workingHours',
-      render: (hours: WorkingHours) => {
-        const startTime = dayjs(hours.start, 'HH:mm').format('HH:mm');
-        const endTime = dayjs(hours.end, 'HH:mm').format('HH:mm');
-        return `${startTime} - ${endTime}`;
-      },
+      title: 'Ca làm việc',
+      dataIndex: 'workSchedule',
+      key: 'workSchedule',
+      render: (schedule: WorkHours) =>
+        `${dayjs(schedule.start, 'HH:mm').format('HH:mm')} - ${dayjs(schedule.end, 'HH:mm').format('HH:mm')}`,
     },
     {
-      title: 'Giới hạn ngày',
-      dataIndex: 'dailyLimit',
-      key: 'dailyLimit',
+      title: 'Giới hạn mỗi ngày',
+      dataIndex: 'dailyQuota',
+      key: 'dailyQuota',
     },
     {
-      title: 'Hành động',
+      title: 'Thao tác',
       key: 'actions',
-      render: (_: any, record: Employee) => (
+      render: (_: any, record: Staff) => (
         <>
-          <Button type="link" onClick={() => openEditModal(record)}>
-            Sửa
-          </Button>
-          <Button type="link" danger onClick={() => deleteEmployee(record.id)}>
-            Xóa
-          </Button>
+          <Button type="link" onClick={() => openEditDialog(record)}>Chỉnh sửa</Button>
+          <Button type="link" danger onClick={() => removeStaff(record.id)}>Xóa</Button>
         </>
       ),
     },
@@ -120,53 +123,47 @@ const EmployeeManagement: React.FC = () => {
 
   return (
     <>
-      <Button type="primary" onClick={() => setModalOpen(true)} style={{ marginBottom: 16 }}>
+      <Button type="primary" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 16 }}>
         Thêm nhân viên
       </Button>
-      <Table columns={tableColumns} dataSource={employeeList} rowKey="id" />
+
+      <Table columns={getColumns()} dataSource={staffList} rowKey="id" />
 
       <Modal
-        title="Chi tiết nhân viên"
-        visible={modalOpen}
-        onOk={() => employeeForm.submit()}
-        onCancel={() => {
-          setModalOpen(false);
-          employeeForm.resetFields();
-        }}
+        title="Thông tin nhân viên"
+        visible={isModalOpen}
+        onOk={() => form.submit()}
+        onCancel={resetModal}
       >
-        <Form form={employeeForm} onFinish={handleEmployeeSubmit} layout="vertical">
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
           <Form.Item name="id" hidden>
             <Input />
           </Form.Item>
 
-          <Form.Item
-            name="name"
-            label="Họ và tên"
-            rules={[{ required: true, message: 'Vui lòng nhập tên nhân viên!' }]}
-          >
+          <Form.Item name="name" label="Tên" rules={[{ required: true, message: 'Vui lòng nhập tên nhân viên!' }]}>
             <Input />
           </Form.Item>
 
           <Form.Item
-            name={['workingHours', 'start']}
-            label="Thời gian bắt đầu làm"
-            rules={[{ required: true, message: 'Vui lòng nhập thời gian bắt đầu làm!' }]}
+            name={['workSchedule', 'start']}
+            label="Bắt đầu ca làm"
+            rules={[{ required: true, message: 'Vui lòng nhập thời gian bắt đầu!' }]}
           >
             <TimePicker format="HH:mm" />
           </Form.Item>
 
           <Form.Item
-            name={['workingHours', 'end']}
-            label="Thời gian kết thúc làm"
-            rules={[{ required: true, message: 'Vui lòng nhập thời gian kết thúc làm!' }]}
+            name={['workSchedule', 'end']}
+            label="Kết thúc ca làm"
+            rules={[{ required: true, message: 'Vui lòng nhập thời gian kết thúc!' }]}
           >
             <TimePicker format="HH:mm" />
           </Form.Item>
 
           <Form.Item
-            name="dailyLimit"
-            label="Giới hạn khách trong ngày"
-            rules={[{ required: true, message: 'Please input daily limit!' }]}
+            name="dailyQuota"
+            label="Số lượng khách tối đa"
+            rules={[{ required: true, message: 'Vui lòng nhập giới hạn khách!' }]}
           >
             <InputNumber min={1} />
           </Form.Item>
@@ -176,4 +173,4 @@ const EmployeeManagement: React.FC = () => {
   );
 };
 
-export default EmployeeManagement;
+export default EmployeeManager;

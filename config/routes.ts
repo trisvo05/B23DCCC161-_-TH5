@@ -72,6 +72,12 @@
 			},
 		],
 	},
+	{
+		path: '/so-van-bang',
+		name: 'Quản lý sổ văn bằng',
+		component: './SoVanBang',
+		icon: '',
+	},
 	
 	// DANH MUC HE THONG
 	// {

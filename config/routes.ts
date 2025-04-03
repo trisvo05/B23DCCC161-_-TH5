@@ -75,8 +75,14 @@
 	{
 		path: '/so-van-bang',
 		name: 'Quản lý sổ văn bằng',
-		component: './SoVanBang',
+		component: './SoVanBang/ListPage',
 		icon: '',
+	},
+	{
+		path: '/so-van-bang/:id/van-bang',
+		name: 'Quản lý văn bằng',
+		component: './SoVanBang/ListPage',
+		hideInMenu: true,
 	},
 	
 	// DANH MUC HE THONG

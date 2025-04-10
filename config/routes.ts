@@ -36,6 +36,13 @@
 		component: './RandomUser',
 		icon: 'ArrowsAltOutlined',
 	},
+	{
+		path: '/membership_application',
+		name: 'Quản lý Đơn đăng ký Thành viên',
+		component: './Member_app/index',
+		icon: 'ArrowsAltOutlined',
+	},
+
 
 	// DANH MUC HE THONG
 	// {

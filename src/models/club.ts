@@ -15,18 +15,13 @@ export interface Club {
     fullName: string;
     email: string;
     phone: string;
-    gender: string;
+    gender: 'Nam' | 'Nữ' | 'Khác';
     address: string;
     strength: string;
     clubId: number;
     reason: string;
-    status: 'Pending' | 'Approved' | 'Rejected';
+    status: 'Đang chờ' | 'Duyệt' | 'Từ chối';
     note?: string;
-    history: {
-      timestamp: string;
-      action: string;
-      admin: string;
-      note?: string;
-    }[];
+    history?: string[]; // Lưu lịch sử thao tác
   }
   

@@ -43,6 +43,13 @@
 		icon: 'ArrowsAltOutlined',
 	},
 
+	{
+		path: '/thong-ke-clb',
+		name: 'Thống kê CLB',
+		component: './ThongKeCLB',
+		icon: 'ArrowsAltOutlined',
+	}
+
 
 	// DANH MUC HE THONG
 	// {
